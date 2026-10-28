@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banking and ATM Transaction Processing System – OS Visualizer</title><link rel="stylesheet" href="style.css"></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/></symbol>
+<symbol id="i-dash" viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+<symbol id="i-queue" viewBox="0 0 24 24"><rect x="3" y="5" width="5" height="14"/><rect x="10" y="5" width="5" height="14"/><rect x="17" y="5" width="4" height="14"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
+<symbol id="i-mem" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="1"/><path d="M7 7v10M11 7v10M15 7v10M6 20v-3M18 20v-3"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19V5M9 7h6M9 11h6"/></symbol></defs></svg>
+<div class="app">
+<aside class="side">
+  <div class="brand"><svg class="i"><use href="#i-bank"/></svg><div><b>BankOps</b><small>OS Algorithm Visualizer</small></div></div>
+  <nav id="nav" aria-label="Modules">
+    <button data-t="home" class="on"><svg class="i"><use href="#i-dash"/></svg>Dashboard</button>
+    <button data-t="cpu"><svg class="i"><use href="#i-cpu"/></svg>CPU Scheduling</button>
+    <button data-t="pc"><svg class="i"><use href="#i-queue"/></svg>Producer–Consumer</button>
+    <button data-t="bank"><svg class="i"><use href="#i-lock"/></svg>Banker's Algorithm</button>
+    <button data-t="mem"><svg class="i"><use href="#i-mem"/></svg>Memory Management</button>
+    <button data-t="osc"><svg class="i"><use href="#i-book"/></svg>OS Concepts</button>
+  </nav>
+</aside>
+<div class="content">
+<header class="top"><div><h1>BankOps: Banking and ATM Transaction Processing System — OS Algorithm Visualizer</h1><p>Compare CPU scheduling algorithms on ATM transactions and monitor the queue, resource safety and memory in one place.</p></div><div class="hbtn"><button class="alt" onclick="window.print()">Export report (PDF)</button><button onclick="show('cpu')">Open CPU Scheduling</button></div></header>
+<main>
+<section id="home">
+  <div class="panel"><h2>CPU scheduling comparison <span class="st" id="st-cpu">Ready</span></h2>
+    <div class="row"><button class="alt" onclick="loadProcs()">Load ATM Sample Data</button><label class="lbl">Round Robin quantum <input id="d-quantum" type="number" min="1" step="1" value="2"></label><button onclick="compareAll()">Compare All Algorithms</button></div>
+    <div id="d-kpi" class="kpis"></div>
+    <div id="d-cmp"></div></div>
+  <div class="dgrid">
+    <div class="panel"><h2>Metric comparison</h2><div id="d-charts"></div></div>
+    <div class="panel"><h2>Gantt timelines <button class="alt replay" onclick="dash()">▶ Replay</button></h2><div id="d-gantt"></div></div>
+  </div>
+  <div id="d-insight"></div>
+  <div class="mods3" id="d-status"></div>
+</section>
+
+<section id="cpu" hidden>
+  <div class="panel"><h2>Process input</h2><p class="info"><b>Formulas:</b> Turnaround time = Completion − Arrival &nbsp;|&nbsp; Waiting time = Turnaround − Burst. SJF and Priority are non-preemptive; Round Robin uses the quantum.</p>
+    <div class="row"><input id="c-id" placeholder="ID e.g. P1" size="6" required><input id="c-name" placeholder="Transaction name"><input id="c-at" type="number" placeholder="Arrival" min="0" step="1" required><input id="c-bt" type="number" placeholder="Burst" min="1" step="1" required><input id="c-pr" type="number" placeholder="Priority" min="1" step="1" required>
+    <button onclick="addProc()">Add process</button><button class="alt" onclick="loadProcs()">Load sample</button><button class="alt" onclick="resetCPU()">Reset</button></div>
+    <p class="note">Lower priority number = higher priority.</p>
+    <div class="scroll"><table id="ptab"></table></div>
+    <div class="row"><select id="algo"><option value="FCFS">FCFS</option><option value="SJF">SJF (non-preemptive)</option><option value="SRTF">SRTF (preemptive SJF)</option><option value="PRIO">Priority (non-preemptive)</option><option value="PPRIO">Priority (preemptive)</option><option value="RR">Round Robin</option></select>
+    <label class="lbl">Time quantum <input id="quantum" type="number" min="1" step="1" value="2"></label><button onclick="runCPU()">Run Simulation</button></div></div>
+  <div class="panel"><h2>Execution results</h2><div id="cpu-out"><p class="muted">Run the scheduler to see the Gantt chart and calculations.</p></div></div>
+  <div class="panel"><h2>Algorithm comparison</h2><div id="cpu-cmp"></div></div>
+</section>
+
+<section id="pc" hidden>
+  <div class="panel"><h2>Queue controls</h2><p class="info"><b>Concept:</b> bounded buffer. Semaphores: empty (free slots), full (filled slots), mutex (one thread in the queue at a time). Orders leave in FIFO order.</p>
+    <div class="row"><label class="lbl">Buffer capacity <input id="cap" type="number" min="1" max="12" value="5"></label><button class="alt" onclick="setCap()">Set / Reset</button><button onclick="produce()">Produce transaction</button><button onclick="consume()">Consume transaction</button></div>
+    <p id="pc-stat" class="note"></p></div>
+  <div class="panel"><h2>Transaction queue (front → rear)</h2><div id="slots" class="slots"></div></div>
+  <div class="panel"><h2>Operation log (latest first)</h2><div id="pc-log" class="log"></div></div>
+</section>
+
+<section id="bank" hidden>
+  <div class="panel"><h2>Resource state input</h2><p class="info"><b>Formula:</b> Need = Maximum − Allocation. A state is safe if every process can finish in some order using Available + released resources.</p>
+    <div class="row"><label class="lbl">Processes <input id="bn" type="number" min="1" max="8" value="5"></label><label class="lbl">Resource types <input id="bm" type="number" min="1" max="6" value="3"></label>
+    <button class="alt" onclick="buildGrid()">Generate grid</button><button class="alt" onclick="loadBank('safe')">Load safe example</button><button class="alt" onclick="loadBank('unsafe')">Load unsafe example</button></div>
+    <p class="note">R0 = Database Connections, R1 = Transaction Processing Services, R2 = ATM Communication Channels. P0..Pn are banking transactions.</p>
+    <div id="bgrid"></div><button onclick="runBank()">Check safety</button></div>
+  <div class="panel"><h2>Safety analysis</h2><div id="bank-out" class="mxgrid"><p class="muted">Run the safety check to see the Need matrix and result.</p></div></div>
+</section>
+
+<section id="mem" hidden>
+  <div class="panel"><h2>Allocation input</h2><p class="info"><b>Concept:</b> First Fit takes the first block large enough; Best Fit takes the smallest block large enough. Unused space inside a block is internal fragmentation.</p>
+    <div class="row"><label class="lbl">Block sizes (KB, comma separated) <input id="blocks" value="100,500,200,300,600"></label><label class="lbl">Process sizes (KB) <input id="msizes" value="212,417,112,426"></label>
+    <select id="malgo"><option value="FF">First Fit</option><option value="BF">Best Fit</option></select><button onclick="runMem()">Allocate</button></div>
+    <p class="note">Processes in order: ATM Withdrawal, Cash Deposit, Fund Transfer, Balance Inquiry, Transaction Record Update.</p></div>
+  <div class="panel"><h2>Memory map and results</h2><div id="mem-out"><p class="muted">Run the allocation to see the memory blocks.</p></div></div>
+  <div class="panel"><h2>First Fit vs Best Fit comparison</h2><div id="mem-cmp"><p class="muted">Run the allocation to compare both algorithms on the same input.</p></div></div>
+</section>
+
+<section id="osc" hidden>
+  <div class="panel"><h2>Operating system concepts</h2><p class="muted">Theory behind each module of BankOps, mapped to banking and ATM transactions.</p>
+  <div class="otopics">
+<div class="otopic"><span class="tag">Module 1</span><h3>CPU Scheduling</h3><p>The OS chooses which ready process gets the CPU so that waiting, turnaround and response times stay low and the CPU stays busy. A <b>preemptive</b> algorithm can interrupt a running process; a <b>non-preemptive</b> one cannot.</p><h5>Terms</h5><p>Arrival time (AT), Burst time (BT), Completion time (CT), Priority, Time quantum, Context switch, Convoy effect, Starvation, Aging.</p><h5>Formulas</h5><p><code>TAT = CT − AT</code> <code>WT = TAT − BT</code> <code>RT = first start − AT</code> <code>Throughput = processes ÷ total time</code></p><h5>In the bank</h5><p>Withdrawals, deposits, transfers and inquiries are processes competing for the server CPU.</p></div><div class="otopic"><span class="tag">Module 2</span><h3>Process Synchronization</h3><p>Cooperating processes share data, so access to the <b>critical section</b> must be controlled. Without it a <b>race condition</b> corrupts the data. A <b>semaphore</b> is an integer changed only by wait() and signal(); a <b>mutex</b> allows one process inside at a time.</p><h5>Bounded buffer</h5><p><code>empty</code> = free slots, <code>full</code> = filled slots, <code>mutex</code> = 1. Producer: wait(empty), wait(mutex), insert, signal(mutex), signal(full). Consumer: wait(full), wait(mutex), remove, signal(mutex), signal(empty).</p><h5>In the bank</h5><p>ATMs produce requests, the core server consumes them in FIFO order. A full queue blocks the producer, an empty queue blocks the consumer.</p></div><div class="otopic"><span class="tag">Module 3</span><h3>Deadlock and Banker's Algorithm</h3><p>Deadlock occurs when processes wait forever for resources held by each other. It needs all four: <b>mutual exclusion</b>, <b>hold and wait</b>, <b>no preemption</b>, <b>circular wait</b>. Ways to handle it: prevention, avoidance, detection and recovery.</p><h5>Banker's Algorithm (avoidance)</h5><p><code>Need = Max − Allocation</code>. A state is <b>safe</b> if some order lets every process finish using Available plus released resources. A request is granted only if the state stays safe.</p><h5>In the bank</h5><p>Database connections, transaction services and ATM channels are the resources.</p></div><div class="otopic"><span class="tag">Module 4</span><h3>Memory Management</h3><p>In contiguous allocation each process gets one block of memory. <b>First Fit</b> takes the first block that fits, <b>Best Fit</b> the smallest block that fits, <b>Worst Fit</b> the largest. Unused space inside an allocated block is <b>internal fragmentation</b>; free holes too small to use are <b>external fragmentation</b>.</p><h5>Formulas</h5><p><code>Internal fragmentation = block − process</code> <code>Utilization = allocated ÷ total memory</code></p><h5>In the bank</h5><p>Each transaction needs a block while it runs; a failed allocation makes it wait.</p></div>
+  </div></div>
+  <div class="panel"><h2>Scheduling algorithms compared</h2><div class="scroll"><table class="cmp concept">
+    <tr><th>Algorithm</th><th>How it picks</th><th>Preemptive</th><th>Starvation</th><th>Strength</th><th>Weakness</th><th>Banking use</th></tr>
+    <tr><th>FCFS</th><td>Earliest arrival</td><td>No</td><td>No</td><td>Simple, fair</td><td>Convoy effect</td><td>Batch statement jobs</td></tr>
+    <tr><th>SJF</th><td>Shortest burst</td><td>No</td><td>Yes (long jobs)</td><td>Minimum avg waiting</td><td>Needs burst estimate</td><td>Balance inquiries first</td></tr>
+    <tr><th>SRTF</th><td>Shortest remaining time</td><td>Yes</td><td>Yes</td><td>Optimal waiting time</td><td>Many switches</td><td>Mixed short/long requests</td></tr>
+    <tr><th>Priority</th><td>Lowest priority number</td><td>No</td><td>Yes (low priority)</td><td>Critical jobs first</td><td>Starvation, needs aging</td><td>Fraud alerts before reports</td></tr>
+    <tr><th>Preemptive Priority</th><td>Highest priority, interrupts</td><td>Yes</td><td>Yes</td><td>Fast for urgent work</td><td>Overhead, starvation</td><td>Security and fraud checks</td></tr>
+    <tr><th>Round Robin</th><td>Time quantum, FIFO ring</td><td>Yes</td><td>No</td><td>Best response, fair</td><td>Quantum sensitive</td><td>Many ATM sessions at once</td></tr></table></div></div>
+</section>
+</main></div></div>
+<script src="app.js"></script></body></html>
